@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation'
+﻿import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import SiteLayout from '@/components/layout/SiteLayout'
@@ -7,6 +7,14 @@ import { formatDate, readingTime } from '@/lib/utils'
 import type { Metadata } from 'next'
 
 interface Props { params: Promise<{ slug: string }> }
+
+interface RelatedNote {
+  id: string
+  title: string
+  slug: string
+  excerpt: string | null
+  published: boolean
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
@@ -35,25 +43,33 @@ export default async function NotaPage({ params }: Props) {
 
   if (!note) notFound()
 
-  const tags    = note.tags?.map((t: { tag: unknown }) => t.tag).filter(Boolean) ?? []
-  const tagIds  = tags.map((t: { id: string }) => t.id)
+  const tags   = (note.tags ?? []).map((t: { tag: unknown }) => t.tag).filter(Boolean) as Array<{ id: string; name: string; slug: string }>
+  const tagIds = tags.map(t => t.id)
 
-  let related: Array<{ id: string; title: string; slug: string; excerpt: string | null }> = []
+  let related: RelatedNote[] = []
   if (tagIds.length > 0) {
-    const { data: rel } = await supabase
-      .from('note_tags').select('note:notes(id,title,slug,excerpt,published)')
-      .in('tag_id', tagIds).neq('note_id', note.id).limit(6)
-    const seen = new Set<string>()
-    related = (rel ?? []).map((r: { note: unknown }) => r.note).filter(Boolean)
-      .filter((n: { id: string; published: boolean }) => { if (!n.published || seen.has(n.id)) return false; seen.add(n.id); return true })
-      .slice(0, 2) as typeof related
+    const { data: noteIds } = await supabase
+      .from('note_tags')
+      .select('note_id')
+      .in('tag_id', tagIds)
+      .neq('note_id', note.id)
+
+    const ids = (noteIds ?? []).map((r: { note_id: string }) => r.note_id)
+
+    if (ids.length > 0) {
+      const { data: relNotes } = await supabase
+        .from('notes')
+        .select('id,title,slug,excerpt,published')
+        .eq('published', true)
+        .in('id', ids)
+        .limit(2)
+      related = (relNotes ?? []) as RelatedNote[]
+    }
   }
 
   return (
     <SiteLayout>
       <article className="max-w-2xl mx-auto px-6 py-20">
-
-        {/* Cabecera */}
         <header className="mb-12">
           <div className="flex items-center gap-3 mb-6 flex-wrap">
             {note.published_at && <time className="text-eyebrow">{formatDate(note.published_at)}</time>}
@@ -69,24 +85,21 @@ export default async function NotaPage({ params }: Props) {
           <div className="divider-gold mt-8" />
         </header>
 
-        {/* Portada */}
         {note.cover_image_url && (
           <div className="relative w-full h-72 md:h-96 rounded-2xl overflow-hidden mb-12 bg-stone-100">
             <Image src={note.cover_image_url} alt={note.title} fill className="object-cover" priority />
           </div>
         )}
 
-        {/* Audio */}
         {note.audio_url && (
           <div className="mb-12 p-5 bg-[#F5EDE0] rounded-xl border border-stone-100">
             <p className="text-eyebrow mb-3">Escuchar nota</p>
-            <audio controls className="w-full" style={{ accentColor: 'var(--gold)' }}>
+            <audio controls className="w-full" style={{ accentColor: '#C9A84C' }}>
               <source src={note.audio_url} type="audio/mpeg" />
             </audio>
           </div>
         )}
 
-        {/* Cuerpo */}
         <div className="prose-refugio">
           {note.body.split('\n\n').map((paragraph: string, i: number) => (
             paragraph.startsWith('"') ? (
@@ -97,11 +110,10 @@ export default async function NotaPage({ params }: Props) {
           ))}
         </div>
 
-        {/* Etiquetas */}
         {tags.length > 0 && (
           <div className="mt-14 pt-8 border-t border-stone-100 flex items-center gap-3 flex-wrap">
             <span className="text-eyebrow mr-1">Temas</span>
-            {tags.map((t: { id: string; name: string; slug: string }) => (
+            {tags.map(t => (
               <Link key={t.id} href={`/buscar?tag=${t.slug}`}
                 className="text-xs text-stone-400 border border-stone-200 px-3 py-1 rounded-full hover:border-stone-400 hover:text-stone-600 transition-colors">
                 {t.name}
@@ -110,14 +122,13 @@ export default async function NotaPage({ params }: Props) {
           </div>
         )}
 
-        {/* Notas relacionadas */}
         {related.length > 0 && (
           <aside className="mt-16 pt-12 border-t border-stone-100">
             <p className="text-eyebrow mb-6">También podría ayudarte</p>
             {related.map(n => (
               <Link key={n.id} href={`/notas/${n.slug}`}
-                className="group flex items-start gap-4 py-5 border-b border-stone-100 last:border-0 hover:opacity-60 transition-opacity">
-                <div className="w-4 h-px bg-stone-200 mt-3 flex-shrink-0 group-hover:bg-stone-500 transition-colors" />
+                className="group flex items-start gap-4 py-5 border-b border-stone-100 last:border-0 hover:opacity-60 transition-opacity block">
+                <div className="w-4 h-px bg-stone-200 mt-3 flex-shrink-0" />
                 <div>
                   <h3 className="font-serif text-xl text-stone-700">{n.title}</h3>
                   {n.excerpt && <p className="text-sm text-stone-400 leading-relaxed mt-1">{n.excerpt}</p>}
@@ -126,7 +137,6 @@ export default async function NotaPage({ params }: Props) {
             ))}
           </aside>
         )}
-
       </article>
     </SiteLayout>
   )
