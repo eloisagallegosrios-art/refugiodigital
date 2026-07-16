@@ -24,13 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return { title: data.title, description: data.excerpt ?? undefined }
 }
 
-export async function generateStaticParams() {
-  const supabase = await createClient()
-  const { data } = await supabase.from('notes').select('slug').eq('published', true)
-  return (data ?? []).map(n => ({ slug: n.slug }))
-}
-
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
 
 export default async function NotaPage({ params }: Props) {
   const { slug } = await params
