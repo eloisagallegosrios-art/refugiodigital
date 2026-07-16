@@ -35,13 +35,15 @@ export default async function BuscarPage({ searchParams }: Props) {
     const { data: t } = await supabase.from('tags').select('id').eq('slug', tag).maybeSingle()
     if (t) {
       const { data } = await supabase
-        .from('note_tags')
-        .select('note:notes(id,title,slug,excerpt,published_at,published)')
-        .eq('tag_id', t.id)
-      notes = ((data ?? []) as Array<{ note: NoteResult | null }>)
-        .map(r => r.note)
-        .filter((n): n is NoteResult => n !== null && n.published)
-        .slice(0, 20)
+        .from('notes')
+        .select('id,title,slug,excerpt,published_at,published')
+        .eq('published', true)
+        .in('id',
+          ((await supabase.from('note_tags').select('note_id').eq('tag_id', t.id)).data ?? [])
+            .map((r: { note_id: string }) => r.note_id)
+        )
+        .limit(20)
+      notes = (data ?? []) as NoteResult[]
     }
   }
 
