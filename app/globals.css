@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Inter:wght@300;400;500&display=swap');
+
+/* ── Variables ─────────────────────────────────────────── */
+:root {
+  --cream:      #FAF7F0;
+  --cream-2:    #F5EDE0;
+  --cream-3:    #EDE3CF;
+  --sand:       #D9C9A8;
+  --gold:       #C9A84C;
+  --gold-light: #E8D48A;
+  --sage:       #7A9E7E;
+  --ink:        #1A1714;
+  --stone-5:    #635C52;
+  --stone-4:    #8C8478;
+  --stone-3:    #B5ADA0;
+  --stone-2:    #D5CFC4;
+  --stone-1:    #EEEAE2;
+}
+
+/* ── Base ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100dvh;
+}
+
+::selection { background: rgba(201,168,76,0.18); }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 2px; }
+
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 2px; }
+
+/* ── Tipografía ────────────────────────────────────────── */
+.font-serif { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+/* Display hero — muy grande, delgado */
+.text-display {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(3.5rem, 9vw, 7rem);
+  font-weight: 300;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+/* Título de sección */
+.text-section {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 300;
+  line-height: 1.15;
+}
+
+/* Cuerpo de lectura */
+.text-body-serif {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.85;
+  font-weight: 400;
+}
+
+/* Eyebrow / label */
+.text-eyebrow {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--stone-4);
+}
+
+/* ── Hero con fotografía ────────────────────────────────── */
+.hero-photo {
+  position: relative;
+  width: 100%;
+  min-height: 95dvh;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 10vh;
+}
+
+.hero-photo-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+/* Gradiente atmosférico sobre la foto */
+.hero-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(26,23,20,0.15) 0%,
+    rgba(26,23,20,0.05) 40%,
+    rgba(26,23,20,0.55) 100%
+  );
+}
+
+.hero-photo-content {
+  position: relative;
+  z-index: 10;
+  color: #FAF7F0;
+}
+
+/* ── Componentes reutilizables ──────────────────────────── */
+.card {
+  background: white;
+  border: 1px solid var(--stone-1);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 32px rgba(26,23,20,0.08);
+  transform: translateY(-2px);
+}
+
+.card-cream {
+  background: var(--cream-2);
+  border: 1px solid var(--stone-1);
+  border-radius: 1rem;
+}
+
+.btn-primary {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.875rem 2.5rem;
+  border: 1px solid rgba(250,247,240,0.5);
+  color: #FAF7F0;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  background: rgba(250,247,240,0.08);
+}
+
+.btn-primary:hover {
+  background: rgba(250,247,240,0.18);
+  border-color: rgba(250,247,240,0.8);
+}
+
+.btn-secondary {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.875rem 2.5rem;
+  border: 1px solid var(--stone-2);
+  color: var(--stone-5);
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  border-color: var(--stone-4);
+  background: white;
+  color: var(--ink);
+}
+
+.divider-gold {
+  width: 3rem;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+}
+
+/* ── Prosa editorial ────────────────────────────────────── */
+.prose-refugio {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.2rem;
+  line-height: 1.9;
+  color: var(--stone-6, #46403A);
+}
+.prose-refugio p  { margin-bottom: 1.75rem; }
+.prose-refugio h2 { font-size: 1.75rem; font-weight: 400; margin: 3rem 0 1rem; }
+.prose-refugio blockquote {
+  border-left: 2px solid var(--gold-light);
+  padding-left: 1.75rem;
+  font-style: italic;
+  color: var(--stone-4);
+  margin: 2.5rem 0;
+  font-size: 1.35rem;
+}
+
+/* ── Animaciones ────────────────────────────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .anim-0 { animation: fadeUp 0.9s ease-out forwards; }
+  .anim-1 { animation: fadeUp 0.9s ease-out 0.2s forwards; opacity: 0; }
+  .anim-2 { animation: fadeUp 0.9s ease-out 0.4s forwards; opacity: 0; }
+  .anim-3 { animation: fadeUp 0.9s ease-out 0.6s forwards; opacity: 0; }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Utilidades ─────────────────────────────────────────── */
+.text-balance { text-wrap: balance; }
+.bg-cream    { background-color: var(--cream); }
+.bg-cream-2  { background-color: var(--cream-2); }
